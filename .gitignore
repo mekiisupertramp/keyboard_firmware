@@ -1,1 +1,8 @@
 .DS_Store
+*.d
+*.o
+*.su
+*.cyclo
+*.elf
+*.list
+*.map
