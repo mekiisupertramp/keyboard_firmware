@@ -70,6 +70,10 @@ static void MX_GPIO_Init(void);
 static void MX_RTC_Init(void);
 static void MX_USART3_UART_Init(void);
 
+void sendKey(uint8_t hidCode);
+void sendKeys(uint8_t* hidCodes, uint8_t modifier, uint8_t number);
+void sendModifier(uint8_t hidCode);
+void release();
 
 
 
@@ -80,25 +84,14 @@ static void MX_USART3_UART_Init(void);
 int main(void)
 {
 
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
@@ -114,6 +107,7 @@ int main(void)
   HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_SET);
   HAL_Delay(1000);
 
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -122,25 +116,60 @@ int main(void)
 
 	  if (keyboardpressed == 1){
 		  for (int i = 0; i < sizeof(hello_sequence); i++){
-			  keyboardhid.MODIFIER = 0x00; // No modifier keys
-			  keyboardhid.KEYCODE1 = 0x4E; // Press 'Page Down' button
-			  keyboardhid.KEYCODE2 = hello_sequence[i]; // Press 'H', 'E', 'L', 'L', 'O'
-			  USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
-			  HAL_Delay(50);
+			  sendKey(hello_sequence[i]);
 		  }
 		  keyboardpressed = 0;
 	  }
 	  else{
-		  keyboardhid.MODIFIER = 0x00; // No modifier keys
-		  keyboardhid.KEYCODE1 = 0x00; // Release key
-		  keyboardhid.KEYCODE2 = 0x00; // Release key
-		  USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
-		  HAL_Delay(50);
+		  release();
 	  }
-
-    /* USER CODE BEGIN 3 */
   }
-  /* USER CODE END 3 */
+}
+void sendKeys(uint8_t* hidCodes, uint8_t modifier, uint8_t number){
+	switch(number){
+		case 0: keyboardhid.MODIFIER=modifier; break;
+		case 1: keyboardhid.MODIFIER=modifier; keyboardhid.KEYCODE1=hidCodes[0]; break;
+		case 2: keyboardhid.MODIFIER=modifier; keyboardhid.KEYCODE1=hidCodes[0];
+				keyboardhid.KEYCODE2=hidCodes[1]; break;
+		case 3: keyboardhid.MODIFIER=modifier; keyboardhid.KEYCODE1=hidCodes[0];
+				keyboardhid.KEYCODE2=hidCodes[1]; keyboardhid.KEYCODE3=hidCodes[2]; break;
+		case 4: keyboardhid.MODIFIER=modifier; keyboardhid.KEYCODE1=hidCodes[0];
+				keyboardhid.KEYCODE2=hidCodes[1]; keyboardhid.KEYCODE3=hidCodes[2];
+				keyboardhid.KEYCODE4=hidCodes[3]; break;
+		case 5: keyboardhid.MODIFIER=modifier; keyboardhid.KEYCODE1=hidCodes[0];
+				keyboardhid.KEYCODE2=hidCodes[1]; keyboardhid.KEYCODE3=hidCodes[2];
+				keyboardhid.KEYCODE4=hidCodes[3]; keyboardhid.KEYCODE5=hidCodes[4]; break;
+		case 6: keyboardhid.MODIFIER=modifier; keyboardhid.KEYCODE1=hidCodes[0];
+				keyboardhid.KEYCODE2=hidCodes[1]; keyboardhid.KEYCODE3=hidCodes[2];
+				keyboardhid.KEYCODE4=hidCodes[3]; keyboardhid.KEYCODE5=hidCodes[4];
+				keyboardhid.KEYCODE6=hidCodes[5]; break;
+		default: return; break;
+	}
+	USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
+	HAL_Delay(50);
+}
+void sendModifier(uint8_t hidCode){
+	keyboardhid.MODIFIER=modifier;
+	USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
+	HAL_Delay(50);
+}
+void sendKey(uint8_t hidCode){
+	keyboardhid.MODIFIER = 0x00; // No modifier keys
+	keyboardhid.KEYCODE1 = hidCode; // Press 'Page Down' button
+	USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
+	HAL_Delay(50);
+}
+
+void release(){
+	keyboardhid.MODIFIER = 0x00; // No modifier keys
+	keyboardhid.KEYCODE1 = 0x00; // Release key
+	keyboardhid.KEYCODE2 = 0x00; // Release key
+	keyboardhid.KEYCODE3 = 0x00; // Release key
+	keyboardhid.KEYCODE4 = 0x00; // Release key
+	keyboardhid.KEYCODE5 = 0x00; // Release key
+	keyboardhid.KEYCODE6 = 0x00; // Release key
+	USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
+	HAL_Delay(50);
 }
 
 /**
