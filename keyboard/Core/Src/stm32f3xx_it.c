@@ -63,6 +63,12 @@ extern PCD_HandleTypeDef hpcd_USB_FS;
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
+
+void EXTI15_10_IRQHandler(void)
+{
+    HAL_GPIO_EXTI_IRQHandler(USER_Btn_Pin);
+}
+
 /**
   * @brief This function handles Non maskable interrupt.
   */

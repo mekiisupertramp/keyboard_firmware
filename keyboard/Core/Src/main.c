@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usb_device.h"
+#include "usbd_hid.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -42,26 +43,35 @@
 
 /* Private variables ---------------------------------------------------------*/
 RTC_HandleTypeDef hrtc;
-
 UART_HandleTypeDef huart3;
 
-/* USER CODE BEGIN PV */
+extern USBD_HandleTypeDef hUsbDeviceFS;
 
-/* USER CODE END PV */
+typedef struct
+{
+uint8_t MODIFIER;
+uint8_t RESERVED;
+uint8_t KEYCODE1;
+uint8_t KEYCODE2;
+uint8_t KEYCODE3;
+uint8_t KEYCODE4;
+uint8_t KEYCODE5;
+uint8_t KEYCODE6;
+} keyboardHID;
 
-/* Private function prototypes -----------------------------------------------*/
+keyboardHID keyboardhid = {0, 0, 0, 0, 0, 0, 0, 0};
+extern uint8_t keyboardpressed;
+uint8_t hello_sequence[11] = {0x0B, 0x08, 0x0F, 0x0F, 0x12, 0x2c, 0x1A, 0x12, 0x15, 0x0F, 0x07}; // Keycodes for 'H', 'E', 'L', 'L', 'O'
+
+
+
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_RTC_Init(void);
 static void MX_USART3_UART_Init(void);
-/* USER CODE BEGIN PFP */
 
-/* USER CODE END PFP */
 
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
 
-/* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
@@ -96,8 +106,13 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
-  /* USER CODE END 2 */
+
+  // enable the 1.5k pull up!!
+  HAL_GPIO_WritePin(USB_PowerSwitchOn_GPIO_Port, USB_PowerSwitchOn_Pin, GPIO_PIN_SET);
+  HAL_Delay(1000);
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -105,12 +120,23 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
-	  HAL_GPIO_TogglePin(LDRed_GPIO_Port, LDRed_Pin);
-	  HAL_Delay(200);
-	  HAL_GPIO_TogglePin(LDBlue_GPIO_Port, LDBlue_Pin);
-	  HAL_Delay(200);
-	  HAL_GPIO_TogglePin(LDGreen_GPIO_Port, LDGreen_Pin);
-	  HAL_Delay(200);
+	  if (keyboardpressed == 1){
+		  for (int i = 0; i < sizeof(hello_sequence); i++){
+			  keyboardhid.MODIFIER = 0x00; // No modifier keys
+			  keyboardhid.KEYCODE1 = 0x4E; // Press 'Page Down' button
+			  keyboardhid.KEYCODE2 = hello_sequence[i]; // Press 'H', 'E', 'L', 'L', 'O'
+			  USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
+			  HAL_Delay(50);
+		  }
+		  keyboardpressed = 0;
+	  }
+	  else{
+		  keyboardhid.MODIFIER = 0x00; // No modifier keys
+		  keyboardhid.KEYCODE1 = 0x00; // Release key
+		  keyboardhid.KEYCODE2 = 0x00; // Release key
+		  USBD_HID_SendReport(&hUsbDeviceFS, (uint8_t*)&keyboardhid, sizeof(keyboardhid));
+		  HAL_Delay(50);
+	  }
 
     /* USER CODE BEGIN 3 */
   }

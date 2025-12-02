@@ -173,14 +173,14 @@ __ALIGN_BEGIN static uint8_t USBD_HID_CfgFSDesc[USB_HID_CONFIG_DESC_SIZ]  __ALIG
   0x00,
   /******************** Descriptor of Mouse endpoint ********************/
   /* 27 */
-  0x07,          /*bLength: Endpoint Descriptor size*/
+  0x09,          /*bLength: Endpoint Descriptor size*/
   USB_DESC_TYPE_ENDPOINT, /*bDescriptorType:*/
 
   HID_EPIN_ADDR,     /*bEndpointAddress: Endpoint Address (IN)*/
   0x03,          /*bmAttributes: Interrupt endpoint*/
   HID_EPIN_SIZE, /*wMaxPacketSize: 4 Byte max */
   0x00,
-  HID_FS_BINTERVAL,          /*bInterval: Polling Interval */
+  0x0A,          /*bInterval: Polling Interval */
   /* 34 */
 };
 
@@ -223,14 +223,14 @@ __ALIGN_BEGIN static uint8_t USBD_HID_CfgHSDesc[USB_HID_CONFIG_DESC_SIZ]  __ALIG
   0x00,
   /******************** Descriptor of Mouse endpoint ********************/
   /* 27 */
-  0x07,          /*bLength: Endpoint Descriptor size*/
-  USB_DESC_TYPE_ENDPOINT, /*bDescriptorType:*/
+  0x09,          /*bLength: Endpoint Descriptor size*/
+   USB_DESC_TYPE_ENDPOINT, /*bDescriptorType:*/
 
-  HID_EPIN_ADDR,     /*bEndpointAddress: Endpoint Address (IN)*/
-  0x03,          /*bmAttributes: Interrupt endpoint*/
-  HID_EPIN_SIZE, /*wMaxPacketSize: 4 Byte max */
-  0x00,
-  HID_HS_BINTERVAL,          /*bInterval: Polling Interval */
+   HID_EPIN_ADDR,     /*bEndpointAddress: Endpoint Address (IN)*/
+   0x03,          /*bmAttributes: Interrupt endpoint*/
+   HID_EPIN_SIZE, /*wMaxPacketSize: 4 Byte max */
+   0x00,
+   0x0A,          /*bInterval: Polling Interval */
   /* 34 */
 };
 
@@ -273,14 +273,14 @@ __ALIGN_BEGIN static uint8_t USBD_HID_OtherSpeedCfgDesc[USB_HID_CONFIG_DESC_SIZ]
   0x00,
   /******************** Descriptor of Mouse endpoint ********************/
   /* 27 */
-  0x07,          /*bLength: Endpoint Descriptor size*/
-  USB_DESC_TYPE_ENDPOINT, /*bDescriptorType:*/
+  0x09,          /*bLength: Endpoint Descriptor size*/
+   USB_DESC_TYPE_ENDPOINT, /*bDescriptorType:*/
 
-  HID_EPIN_ADDR,     /*bEndpointAddress: Endpoint Address (IN)*/
-  0x03,          /*bmAttributes: Interrupt endpoint*/
-  HID_EPIN_SIZE, /*wMaxPacketSize: 4 Byte max */
-  0x00,
-  HID_FS_BINTERVAL,          /*bInterval: Polling Interval */
+   HID_EPIN_ADDR,     /*bEndpointAddress: Endpoint Address (IN)*/
+   0x03,          /*bmAttributes: Interrupt endpoint*/
+   HID_EPIN_SIZE, /*wMaxPacketSize: 4 Byte max */
+   0x00,
+   0x0A,          /*bInterval: Polling Interval */
   /* 34 */
 };
 

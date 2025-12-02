@@ -42,6 +42,9 @@
 /* USB Device Core handle declaration. */
 USBD_HandleTypeDef hUsbDeviceFS;
 
+extern PCD_HandleTypeDef hpcd_USB_FS;
+uint8_t keyboardpressed = 0;
+
 /*
  * -- Insert your variables declaration here --
  */
@@ -53,6 +56,35 @@ USBD_HandleTypeDef hUsbDeviceFS;
  * -- Insert your external function declaration here --
  */
 /* USER CODE BEGIN 1 */
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if (GPIO_Pin == USER_Btn_Pin){
+	   if ((((USBD_HandleTypeDef *) hpcd_USB_FS.pData)->dev_remote_wakeup == 1) &&
+			(((USBD_HandleTypeDef *) hpcd_USB_FS.pData)->dev_state == USBD_STATE_SUSPENDED)){
+		  if ((&hpcd_USB_FS)->Init.low_power_enable){
+			HAL_ResumeTick();
+		  }
+		  /* Activate Remote wakeup */
+		  HAL_PCD_ActivateRemoteWakeup((&hpcd_USB_FS));
+
+		  /* Remote wakeup delay */
+		  HAL_Delay(10);
+
+		  /* Disable Remote wakeup */
+		  HAL_PCD_DeActivateRemoteWakeup((&hpcd_USB_FS));
+
+		  /* change state to configured */
+		  ((USBD_HandleTypeDef *) hpcd_USB_FS.pData)->dev_state = USBD_STATE_CONFIGURED;
+
+		  /* Change remote_wakeup feature to 0 */
+		  ((USBD_HandleTypeDef *) hpcd_USB_FS.pData)->dev_remote_wakeup = 0;
+		}
+	  else if (((USBD_HandleTypeDef *) hpcd_USB_FS.pData)->dev_state == USBD_STATE_CONFIGURED)
+		keyboardpressed=1;
+	  }
+}
+
 
 /* USER CODE END 1 */
 
