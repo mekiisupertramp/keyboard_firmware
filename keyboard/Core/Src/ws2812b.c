@@ -16,7 +16,7 @@ DMA_HandleTypeDef hdma_tim2_ch2_ch4;
 uint8_t ws2812_leds[WS2812_LED_COUNT][3];
 
 // DMA waveform buffer: 24 bits per LED + 50 reset cycles
-uint16_t ws2812_dmaBuffer[WS2812_LED_COUNT * 24 + 50];
+uint32_t ws2812_dmaBuffer[WS2812_LED_COUNT * 24 + 50];
 
 
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
@@ -70,11 +70,15 @@ void setWs2812b(void){
 void refreshWs2812b(void){
 	setWs2812b(); // encode RGB in the send buffer
 
-	//HAL_TIM_PWM_Stop_DMA(&htim2, TIM_CHANNEL_4); // Ensure previous DMA completed
+	HAL_TIM_PWM_Stop_DMA(&htim2, TIM_CHANNEL_4); // Ensure previous DMA completed
+
+	//HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
 
 	HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_4, // Start DMA transfer
-						  (uint32_t*)ws2812_dmaBuffer,
+						   ws2812_dmaBuffer,
 						  (WS2812_LED_COUNT * 24 + 50));
+
+	//__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, 45);
 }
 
 /**
