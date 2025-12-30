@@ -128,7 +128,7 @@ int main(void)
 
 
 	  // chase light
-	  for (int i = 0; i < WS2812_LED_COUNT; i++)
+	 /* for (int i = 0; i < WS2812_LED_COUNT; i++)
 	  {
 		  setPWs2812b(i, 0, 255, 255);
 		  refreshWs2812b();
@@ -136,7 +136,11 @@ int main(void)
 
 		  // turn off before next
 		  setPWs2812b(i, 0, 0, 0);
-	  }
+	  }*/
+	  setPWs2812b(0, 0, 0, 2);
+	  setPWs2812b(1, 0, 2, 0);
+	  setPWs2812b(2, 2, 0, 0);
+	  refreshWs2812b();
   }
 }
 void sendKeys(uint8_t* hidCodes, uint8_t modifier, uint8_t number){
